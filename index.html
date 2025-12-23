@@ -49,7 +49,14 @@
             <div v-for="(products, category) in filteredProducts" :key="category" class="mb-6">
                 <h2 class="text-blue-600 font-bold mb-2 uppercase text-xs tracking-wider border-b pb-1">{{ category }}</h2>
                 <div v-for="prod in products" :key="prod.id" class="bg-white p-3 rounded-lg shadow-sm mb-2 flex items-center gap-3">
-                    <img :src="prod.img" class="w-12 h-12 object-cover rounded-md bg-gray-100 border" @error="imageError">
+                    
+                    <a :href="prod.link || '#'" target="_blank" class="block shrink-0 relative group">
+                        <img :src="prod.img" class="w-12 h-12 object-cover rounded-md bg-gray-100 border" @error="imageError">
+                        <div v-if="prod.link" class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-tl-md text-[8px] p-1">
+                            <i class="fa-solid fa-external-link-alt"></i>
+                        </div>
+                    </a>
+
                     <div class="flex-1">
                         <h3 class="font-semibold text-gray-800 leading-tight">{{ prod.name }}</h3>
                         <p class="text-xs text-gray-500">{{ prod.capacity }} {{ prod.unit }} - {{ prod.price.toFixed(2) }} €</p>
@@ -227,7 +234,6 @@
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
-                    
                     <button @click="addBatchRow" class="w-full border-2 border-dashed border-green-500 text-green-600 py-2 rounded-lg font-bold mb-4 hover:bg-green-50 active:bg-green-100">
                         <i class="fa-solid fa-plus"></i> Aggiungi altra scadenza
                     </button>
@@ -262,7 +268,6 @@
     <div v-if="editBatchData" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in">
         <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Modifica Lotto</h3>
-            
             <div class="mb-4">
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Quantità</label>
                 <select v-model.number="editBatchData.qty" class="w-full p-2 border rounded-lg bg-white font-bold">
@@ -273,7 +278,6 @@
                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Scadenza</label>
                 <input v-model="editBatchData.expiry" type="date" class="w-full p-2 border rounded-lg bg-white">
             </div>
-
             <div class="flex gap-3">
                 <button @click="editBatchData = null" class="flex-1 py-3 text-gray-500 font-bold bg-gray-100 rounded-xl">Annulla</button>
                 <button @click="saveBatchEdit" class="flex-1 py-3 text-white font-bold bg-blue-600 rounded-xl shadow active:bg-blue-700">Salva Modifiche</button>
@@ -309,10 +313,15 @@
                 <label class="block text-xs text-gray-500 mb-1 font-bold">Prezzo (€)</label>
                 <input v-model.number="editingProduct.price" type="number" step="0.01" class="w-full border p-2 rounded">
             </div>
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="block text-xs text-gray-500 mb-1 font-bold">URL Immagine</label>
-                <input v-model="editingProduct.img" class="w-full border p-2 rounded text-xs">
+                <input v-model="editingProduct.img" class="w-full border p-2 rounded text-xs" placeholder="Incolla link foto qui">
             </div>
+            <div class="mb-4">
+                <label class="block text-xs text-gray-500 mb-1 font-bold text-blue-600">Link Pagina Prodotto</label>
+                <input v-model="editingProduct.link" class="w-full border-blue-200 border p-2 rounded text-xs" placeholder="Incolla link pagina Just qui">
+            </div>
+
             <div class="flex justify-end gap-2 pt-3 border-t">
                 <button v-if="!isNewProduct" @click="deleteProduct(editingProduct)" class="text-red-500 px-4 py-2"><i class="fa-solid fa-trash"></i></button>
                 <button @click="editingProduct = null" class="text-gray-500 px-4 py-2">Annulla</button>
@@ -329,107 +338,107 @@
 
     // DATABASE COMPLETO
     const initialProducts = [
-        { cat: "Bagni Caldi ed Essenze", name: "Bagno Purificante", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Bagno Tonificante", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Bagno Rilassante", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Bagno Equilibrante", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Essenza Echinacea", capacity: 75, unit: "ml", price: 24.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Essenza Timo", capacity: 75, unit: "ml", price: 24.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Essenza Ginepro", capacity: 75, unit: "ml", price: 24.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Essenza Sandalo", capacity: 75, unit: "ml", price: 24.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Essenza Melissa", capacity: 75, unit: "ml", price: 24.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Bagno Vivisal", capacity: 500, unit: "gr", price: 30.50, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Scrub Detox Vivisal", capacity: 150, unit: "ml", price: 25.50, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Doccia Schiuma Erbe", capacity: 300, unit: "ml", price: 22.00, img: "" },
-        { cat: "Bagni Caldi ed Essenze", name: "Doccia Gel Latte Miele Riso", capacity: 250, unit: "ml", price: 19.00, img: "" },
-        { cat: "Oli Essenziali", name: "Relax Attivatore", capacity: 10, unit: "ml", price: 19.50, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Eucalipto", capacity: 50, unit: "ml", price: 31.50, img: "" },
-        { cat: "Oli Essenziali", name: "Olio 31", capacity: 75, unit: "ml", price: 38.00, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Limone", capacity: 10, unit: "ml", price: 15.00, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Lavanda", capacity: 10, unit: "ml", price: 17.00, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Arancio", capacity: 10, unit: "ml", price: 15.00, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Menta", capacity: 10, unit: "ml", price: 16.00, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Tea Tree", capacity: 10, unit: "ml", price: 19.00, img: "" },
-        { cat: "Oli Essenziali", name: "Olio Geranio", capacity: 10, unit: "ml", price: 20.00, img: "" },
-        { cat: "Oli Essenziali", name: "Tono e Armonia", capacity: 10, unit: "ml", price: 16.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Gel Arnica", capacity: 100, unit: "ml", price: 24.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Tea Tree", capacity: 100, unit: "ml", price: 22.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Attiva", capacity: 100, unit: "ml", price: 22.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Calendula", capacity: 100, unit: "ml", price: 23.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Lavanda", capacity: 100, unit: "ml", price: 23.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Ginepro", capacity: 100, unit: "ml", price: 22.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Timo", capacity: 100, unit: "ml", price: 22.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Gel Consolida", capacity: 100, unit: "ml", price: 23.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Gel Ventonik", capacity: 100, unit: "ml", price: 22.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Mani Camomilla", capacity: 100, unit: "ml", price: 20.00, img: "" },
-        { cat: "Creme Dermoattive", name: "Crema Gel Bodyfresh", capacity: 100, unit: "ml", price: 19.00, img: "" },
-        { cat: "Specifici", name: "Eucasol", capacity: 50, unit: "ml", price: 17.00, img: "" },
-        { cat: "Specifici", name: "Lozione Anti-Insetti", capacity: 75, unit: "ml", price: 23.00, img: "" },
-        { cat: "Specifici", name: "Crema Labbra", capacity: 20, unit: "ml", price: 15.00, img: "" },
-        { cat: "Specifici", name: "Gel Lavamani", capacity: 250, unit: "ml", price: 18.00, img: "" },
-        { cat: "Specifici", name: "Crema Schiarente", capacity: 100, unit: "ml", price: 26.00, img: "" },
-        { cat: "Specifici", name: "Spray Naso Libero", capacity: 100, unit: "ml", price: 24.00, img: "" },
-        { cat: "Specifici", name: "Lozione Astringente", capacity: 250, unit: "ml", price: 20.00, img: "" },
-        { cat: "Specifici", name: "Olio Riparatore", capacity: 40, unit: "ml", price: 23.00, img: "" },
-        { cat: "Specifici", name: "Crema Fango Termale", capacity: 200, unit: "ml", price: 41.00, img: "" },
-        { cat: "Piedi e Gambe", name: "Sali Piedi Pedisal", capacity: 500, unit: "gr", price: 15.00, img: "" },
-        { cat: "Piedi e Gambe", name: "Crema Piedi Pedicream", capacity: 100, unit: "ml", price: 18.00, img: "" },
-        { cat: "Piedi e Gambe", name: "Spray Piedi Pedibon", capacity: 75, unit: "ml", price: 18.00, img: "" },
-        { cat: "Malva", name: "Crema Viso Malva", capacity: 50, unit: "ml", price: 32.00, img: "" },
-        { cat: "Malva", name: "Latte Malva", capacity: 250, unit: "ml", price: 29.50, img: "" },
-        { cat: "Malva", name: "Deo Roll-On Malva", capacity: 50, unit: "ml", price: 17.00, img: "" },
-        { cat: "Igiene Orale", name: "Set Igiene Orale Giorno-Notte", capacity: 150, unit: "ml", price: 20.00, img: "" },
-        { cat: "Igiene Orale", name: "Collutorio", capacity: 75, unit: "ml", price: 18.00, img: "" },
-        { cat: "Baby", name: "Baby Bagno Doccia", capacity: 250, unit: "ml", price: 24.00, img: "" },
-        { cat: "Baby", name: "Baby Crema", capacity: 100, unit: "ml", price: 21.00, img: "" },
-        { cat: "Intim", name: "Deo Intim", capacity: 250, unit: "ml", price: 26.00, img: "" },
-        { cat: "Intim", name: "Gel Intim", capacity: 30, unit: "ml", price: 14.50, img: "" },
-        { cat: "Lozioni Corpo", name: "Balsamo Corpo", capacity: 250, unit: "ml", price: 22.00, img: "" },
-        { cat: "Lozioni Corpo", name: "Olio Riattivante", capacity: 125, unit: "ml", price: 22.00, img: "" },
-        { cat: "Lozioni Corpo", name: "Deo Plus", capacity: 75, unit: "ml", price: 17.00, img: "" },
-        { cat: "Lozioni Corpo", name: "Latte Mandorle", capacity: 250, unit: "ml", price: 20.00, img: "" },
-        { cat: "Lamelloderm", name: "Doccia Lamelloderm", capacity: 200, unit: "ml", price: 23.00, img: "" },
-        { cat: "Lamelloderm", name: "Crema Lamelloderm Repair", capacity: 100, unit: "ml", price: 33.50, img: "" },
-        { cat: "Body Reform", name: "Fluido Corpo Anticellulite", capacity: 200, unit: "ml", price: 51.00, img: "" },
-        { cat: "Body Reform", name: "Fluido Seno Rassodante", capacity: 100, unit: "ml", price: 36.50, img: "" },
-        { cat: "Uomo", name: "Shaving Gel", capacity: 100, unit: "ml", price: 21.00, img: "" },
-        { cat: "Uomo", name: "After Shave Gel", capacity: 60, unit: "ml", price: 18.00, img: "" },
-        { cat: "Solari", name: "Latte Solare 6", capacity: 125, unit: "ml", price: 19.50, img: "" },
-        { cat: "Solari", name: "Latte Solare Spray 15", capacity: 200, unit: "ml", price: 31.50, img: "" },
-        { cat: "Solari", name: "Latte Solare 30", capacity: 250, unit: "ml", price: 31.50, img: "" },
-        { cat: "Solari", name: "Crema Viso Solare 30", capacity: 50, unit: "ml", price: 28.50, img: "" },
-        { cat: "Solari", name: "Latte Solare 50", capacity: 125, unit: "ml", price: 29.50, img: "" },
-        { cat: "Solari", name: "Gel Doposole", capacity: 250, unit: "ml", price: 31.50, img: "" },
-        { cat: "Infiore", name: "Crema 24h Rimpolpante", capacity: 50, unit: "ml", price: 59.00, img: "" },
-        { cat: "Infiore", name: "Crema Giorno Rigenerante", capacity: 50, unit: "ml", price: 53.00, img: "" },
-        { cat: "Infiore", name: "Crema Notte Rigenerante", capacity: 50, unit: "ml", price: 53.00, img: "" },
-        { cat: "Infiore", name: "Crema Contorno Occhi", capacity: 30, unit: "ml", price: 50.00, img: "" },
-        { cat: "Infiore", name: "Siero Ultra-Rigenerante", capacity: 30, unit: "ml", price: 53.00, img: "" },
-        { cat: "Infiore", name: "Crema Detergente", capacity: 125, unit: "ml", price: 30.50, img: "" },
-        { cat: "Infiore", name: "Gel Detergente", capacity: 125, unit: "ml", price: 30.50, img: "" },
-        { cat: "Infiore", name: "Peeling", capacity: 50, unit: "ml", price: 37.50, img: "" },
-        { cat: "Infiore", name: "Maschera Gel Rassodante", capacity: 75, unit: "ml", price: 39.50, img: "" },
-        { cat: "Infiore", name: "Idrogel Ultra-Idratante", capacity: 50, unit: "ml", price: 39.50, img: "" },
-        { cat: "Infiore", name: "Struccante Micellare", capacity: 150, unit: "ml", price: 24.00, img: "" },
-        { cat: "Infiore", name: "Tonico Vitalizzante", capacity: 150, unit: "ml", price: 22.00, img: "" },
-        { cat: "Infiore", name: "Latte Corpo Vellutante", capacity: 200, unit: "ml", price: 29.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Addolcente", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Rigenerante", capacity: 250, unit: "ml", price: 25.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Purificante", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Antiforfora", capacity: 250, unit: "ml", price: 23.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Ravvivante", capacity: 250, unit: "ml", price: 24.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Tea Tree", capacity: 250, unit: "ml", price: 29.00, img: "" },
-        { cat: "Capelli", name: "Shampoo Volumizzante", capacity: 250, unit: "ml", price: 26.00, img: "" },
-        { cat: "Capelli", name: "Balsamo Disciplinante", capacity: 150, unit: "ml", price: 22.00, img: "" },
-        { cat: "Capelli", name: "Lozione Anticaduta", capacity: 75, unit: "ml", price: 32.50, img: "" },
-        { cat: "Capelli", name: "Latte Spray Riparatore", capacity: 120, unit: "ml", price: 26.00, img: "" },
-        { cat: "Integrazione Alimentare", name: "+Energy", capacity: 60, unit: "gr", price: 34.50, img: "" },
-        { cat: "Amici Animali", name: "Shampoo Cani e Gatti", capacity: 200, unit: "ml", price: 18.00, img: "" },
-        { cat: "Casa", name: "Detergente NR Plus", capacity: 1000, unit: "ml", price: 22.00, img: "" },
-        { cat: "Casa", name: "Spray Lavanda", capacity: 115, unit: "ml", price: 31.50, img: "" },
-        { cat: "Casa", name: "Spray Ambientale", capacity: 200, unit: "ml", price: 21.00, img: "" },
-        { cat: "Casa", name: "Smacchiatore Pretrattante", capacity: 75, unit: "ml", price: 13.00, img: "" },
-        { cat: "Casa", name: "Cura Legno", capacity: 200, unit: "ml", price: 22.00, img: "" }
+        { cat: "Bagni Caldi ed Essenze", name: "Bagno Purificante", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Bagno Tonificante", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Bagno Rilassante", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Bagno Equilibrante", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Essenza Echinacea", capacity: 75, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Essenza Timo", capacity: 75, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Essenza Ginepro", capacity: 75, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Essenza Sandalo", capacity: 75, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Essenza Melissa", capacity: 75, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Bagno Vivisal", capacity: 500, unit: "gr", price: 30.50, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Scrub Detox Vivisal", capacity: 150, unit: "ml", price: 25.50, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Doccia Schiuma Erbe", capacity: 300, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Bagni Caldi ed Essenze", name: "Doccia Gel Latte Miele Riso", capacity: 250, unit: "ml", price: 19.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Relax Attivatore", capacity: 10, unit: "ml", price: 19.50, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Eucalipto", capacity: 50, unit: "ml", price: 31.50, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio 31", capacity: 75, unit: "ml", price: 38.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Limone", capacity: 10, unit: "ml", price: 15.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Lavanda", capacity: 10, unit: "ml", price: 17.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Arancio", capacity: 10, unit: "ml", price: 15.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Menta", capacity: 10, unit: "ml", price: 16.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Tea Tree", capacity: 10, unit: "ml", price: 19.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Olio Geranio", capacity: 10, unit: "ml", price: 20.00, img: "", link: "" },
+        { cat: "Oli Essenziali", name: "Tono e Armonia", capacity: 10, unit: "ml", price: 16.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Gel Arnica", capacity: 100, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Tea Tree", capacity: 100, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Attiva", capacity: 100, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Calendula", capacity: 100, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Lavanda", capacity: 100, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Ginepro", capacity: 100, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Timo", capacity: 100, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Gel Consolida", capacity: 100, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Gel Ventonik", capacity: 100, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Mani Camomilla", capacity: 100, unit: "ml", price: 20.00, img: "", link: "" },
+        { cat: "Creme Dermoattive", name: "Crema Gel Bodyfresh", capacity: 100, unit: "ml", price: 19.00, img: "", link: "" },
+        { cat: "Specifici", name: "Eucasol", capacity: 50, unit: "ml", price: 17.00, img: "", link: "" },
+        { cat: "Specifici", name: "Lozione Anti-Insetti", capacity: 75, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Specifici", name: "Crema Labbra", capacity: 20, unit: "ml", price: 15.00, img: "", link: "" },
+        { cat: "Specifici", name: "Gel Lavamani", capacity: 250, unit: "ml", price: 18.00, img: "", link: "" },
+        { cat: "Specifici", name: "Crema Schiarente", capacity: 100, unit: "ml", price: 26.00, img: "", link: "" },
+        { cat: "Specifici", name: "Spray Naso Libero", capacity: 100, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Specifici", name: "Lozione Astringente", capacity: 250, unit: "ml", price: 20.00, img: "", link: "" },
+        { cat: "Specifici", name: "Olio Riparatore", capacity: 40, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Specifici", name: "Crema Fango Termale", capacity: 200, unit: "ml", price: 41.00, img: "", link: "" },
+        { cat: "Piedi e Gambe", name: "Sali Piedi Pedisal", capacity: 500, unit: "gr", price: 15.00, img: "", link: "" },
+        { cat: "Piedi e Gambe", name: "Crema Piedi Pedicream", capacity: 100, unit: "ml", price: 18.00, img: "", link: "" },
+        { cat: "Piedi e Gambe", name: "Spray Piedi Pedibon", capacity: 75, unit: "ml", price: 18.00, img: "", link: "" },
+        { cat: "Malva", name: "Crema Viso Malva", capacity: 50, unit: "ml", price: 32.00, img: "", link: "" },
+        { cat: "Malva", name: "Latte Malva", capacity: 250, unit: "ml", price: 29.50, img: "", link: "" },
+        { cat: "Malva", name: "Deo Roll-On Malva", capacity: 50, unit: "ml", price: 17.00, img: "", link: "" },
+        { cat: "Igiene Orale", name: "Set Igiene Orale Giorno-Notte", capacity: 150, unit: "ml", price: 20.00, img: "", link: "" },
+        { cat: "Igiene Orale", name: "Collutorio", capacity: 75, unit: "ml", price: 18.00, img: "", link: "" },
+        { cat: "Baby", name: "Baby Bagno Doccia", capacity: 250, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Baby", name: "Baby Crema", capacity: 100, unit: "ml", price: 21.00, img: "", link: "" },
+        { cat: "Intim", name: "Deo Intim", capacity: 250, unit: "ml", price: 26.00, img: "", link: "" },
+        { cat: "Intim", name: "Gel Intim", capacity: 30, unit: "ml", price: 14.50, img: "", link: "" },
+        { cat: "Lozioni Corpo", name: "Balsamo Corpo", capacity: 250, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Lozioni Corpo", name: "Olio Riattivante", capacity: 125, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Lozioni Corpo", name: "Deo Plus", capacity: 75, unit: "ml", price: 17.00, img: "", link: "" },
+        { cat: "Lozioni Corpo", name: "Latte Mandorle", capacity: 250, unit: "ml", price: 20.00, img: "", link: "" },
+        { cat: "Lamelloderm", name: "Doccia Lamelloderm", capacity: 200, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Lamelloderm", name: "Crema Lamelloderm Repair", capacity: 100, unit: "ml", price: 33.50, img: "", link: "" },
+        { cat: "Body Reform", name: "Fluido Corpo Anticellulite", capacity: 200, unit: "ml", price: 51.00, img: "", link: "" },
+        { cat: "Body Reform", name: "Fluido Seno Rassodante", capacity: 100, unit: "ml", price: 36.50, img: "", link: "" },
+        { cat: "Uomo", name: "Shaving Gel", capacity: 100, unit: "ml", price: 21.00, img: "", link: "" },
+        { cat: "Uomo", name: "After Shave Gel", capacity: 60, unit: "ml", price: 18.00, img: "", link: "" },
+        { cat: "Solari", name: "Latte Solare 6", capacity: 125, unit: "ml", price: 19.50, img: "", link: "" },
+        { cat: "Solari", name: "Latte Solare Spray 15", capacity: 200, unit: "ml", price: 31.50, img: "", link: "" },
+        { cat: "Solari", name: "Latte Solare 30", capacity: 250, unit: "ml", price: 31.50, img: "", link: "" },
+        { cat: "Solari", name: "Crema Viso Solare 30", capacity: 50, unit: "ml", price: 28.50, img: "", link: "" },
+        { cat: "Solari", name: "Latte Solare 50", capacity: 125, unit: "ml", price: 29.50, img: "", link: "" },
+        { cat: "Solari", name: "Gel Doposole", capacity: 250, unit: "ml", price: 31.50, img: "", link: "" },
+        { cat: "Infiore", name: "Crema 24h Rimpolpante", capacity: 50, unit: "ml", price: 59.00, img: "", link: "" },
+        { cat: "Infiore", name: "Crema Giorno Rigenerante", capacity: 50, unit: "ml", price: 53.00, img: "", link: "" },
+        { cat: "Infiore", name: "Crema Notte Rigenerante", capacity: 50, unit: "ml", price: 53.00, img: "", link: "" },
+        { cat: "Infiore", name: "Crema Contorno Occhi", capacity: 30, unit: "ml", price: 50.00, img: "", link: "" },
+        { cat: "Infiore", name: "Siero Ultra-Rigenerante", capacity: 30, unit: "ml", price: 53.00, img: "", link: "" },
+        { cat: "Infiore", name: "Crema Detergente", capacity: 125, unit: "ml", price: 30.50, img: "", link: "" },
+        { cat: "Infiore", name: "Gel Detergente", capacity: 125, unit: "ml", price: 30.50, img: "", link: "" },
+        { cat: "Infiore", name: "Peeling", capacity: 50, unit: "ml", price: 37.50, img: "", link: "" },
+        { cat: "Infiore", name: "Maschera Gel Rassodante", capacity: 75, unit: "ml", price: 39.50, img: "", link: "" },
+        { cat: "Infiore", name: "Idrogel Ultra-Idratante", capacity: 50, unit: "ml", price: 39.50, img: "", link: "" },
+        { cat: "Infiore", name: "Struccante Micellare", capacity: 150, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Infiore", name: "Tonico Vitalizzante", capacity: 150, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Infiore", name: "Latte Corpo Vellutante", capacity: 200, unit: "ml", price: 29.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Addolcente", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Rigenerante", capacity: 250, unit: "ml", price: 25.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Purificante", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Antiforfora", capacity: 250, unit: "ml", price: 23.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Ravvivante", capacity: 250, unit: "ml", price: 24.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Tea Tree", capacity: 250, unit: "ml", price: 29.00, img: "", link: "" },
+        { cat: "Capelli", name: "Shampoo Volumizzante", capacity: 250, unit: "ml", price: 26.00, img: "", link: "" },
+        { cat: "Capelli", name: "Balsamo Disciplinante", capacity: 150, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Capelli", name: "Lozione Anticaduta", capacity: 75, unit: "ml", price: 32.50, img: "", link: "" },
+        { cat: "Capelli", name: "Latte Spray Riparatore", capacity: 120, unit: "ml", price: 26.00, img: "", link: "" },
+        { cat: "Integrazione Alimentare", name: "+Energy", capacity: 60, unit: "gr", price: 34.50, img: "", link: "" },
+        { cat: "Amici Animali", name: "Shampoo Cani e Gatti", capacity: 200, unit: "ml", price: 18.00, img: "", link: "" },
+        { cat: "Casa", name: "Detergente NR Plus", capacity: 1000, unit: "ml", price: 22.00, img: "", link: "" },
+        { cat: "Casa", name: "Spray Lavanda", capacity: 115, unit: "ml", price: 31.50, img: "", link: "" },
+        { cat: "Casa", name: "Spray Ambientale", capacity: 200, unit: "ml", price: 21.00, img: "", link: "" },
+        { cat: "Casa", name: "Smacchiatore Pretrattante", capacity: 75, unit: "ml", price: 13.00, img: "", link: "" },
+        { cat: "Casa", name: "Cura Legno", capacity: 200, unit: "ml", price: 22.00, img: "", link: "" }
     ].map((p, i) => ({ ...p, id: i + 1 }));
 
     createApp({
@@ -445,7 +454,7 @@
                 // Gestione Carico (Multi-row)
                 showAddModal: false,
                 selectedProd: null,
-                addBatches: [{ qty: 1, expiry: '' }], // Array per gestire più scadenze
+                addBatches: [{ qty: 1, expiry: '' }], 
                 
                 // Gestione Scarico
                 showSellModal: false,
@@ -538,11 +547,12 @@
             // --- GESTIONE ARTICOLI ---
             editProduct(prod) {
                 this.isNewProduct = false;
-                this.editingProduct = { ...prod };
+                // Assicura che il campo link esista anche se il prodotto è vecchio
+                this.editingProduct = { link: '', ...prod };
             },
             openNewProductModal() {
                 this.isNewProduct = true;
-                this.editingProduct = { id: Date.now(), name: '', cat: '', capacity: null, unit: 'ml', price: null, img: '' };
+                this.editingProduct = { id: Date.now(), name: '', cat: '', capacity: null, unit: 'ml', price: null, img: '', link: '' };
             },
             saveProductEdit() {
                 if (!this.editingProduct.name || !this.editingProduct.cat) { alert("Nome e Categoria obbligatori."); return; }
@@ -581,12 +591,9 @@
                 this.newItemSearch = '';
             },
             confirmAdd() {
-                // Validazione: controlla che tutte le righe abbiano scadenza
                 for (let batch of this.addBatches) {
                     if (!batch.expiry) { alert('Inserisci la data di scadenza per tutte le righe.'); return; }
                 }
-
-                // Aggiunta Loop
                 this.addBatches.forEach(batch => {
                     this.inventory.push({
                         prodId: this.selectedProd.id,
@@ -596,7 +603,6 @@
                     });
                     this.logHistory(this.selectedProd.name, batch.qty, 'IN');
                 });
-
                 this.saveData();
                 this.closeAddModal();
                 alert("Carico completato!");
@@ -635,14 +641,13 @@
             openEditBatchModal(item, batchIndex) {
                 const batch = item.batches[batchIndex];
                 this.editBatchData = {
-                    originalBatch: batch, // Riferimento all'oggetto originale
+                    originalBatch: batch, 
                     qty: batch.qty,
                     expiry: batch.expiry
                 };
             },
             saveBatchEdit() {
                 if(!this.editBatchData.expiry) { alert("Data scadenza obbligatoria"); return; }
-                // Aggiorna l'oggetto originale
                 this.editBatchData.originalBatch.qty = this.editBatchData.qty;
                 this.editBatchData.originalBatch.expiry = this.editBatchData.expiry;
                 this.saveData();
